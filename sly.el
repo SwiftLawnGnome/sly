@@ -1669,6 +1669,10 @@ EVAL'd by Lisp."
   (string-to-number (buffer-substring (point) (+ (point) 6))
                     16))
 
+(defsubst sly-net-decode-length ()
+  (string-to-number (buffer-substring (point) (+ (point) 6))
+                    16))
+
 (defun sly-net-have-input-p ()
   "Return true if a complete message is available."
   (goto-char (point-min))
