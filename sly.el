@@ -1595,9 +1595,13 @@ EVAL'd by Lisp."
                         (fboundp sly-net-send-translator))
                    (funcall sly-net-send-translator sexp)
                  sexp))
-         (payload (encode-coding-string
-                   (concat (sly-prin1-to-string sexp) "\n")
-                   'utf-8-unix))
+         (payload (let (print-escape-nonascii
+                        print-escape-newlines
+                        print-length
+                        print-level)
+                    (encode-coding-string
+                     (concat (prin1-to-string sexp) "\n")
+                     'utf-8-unix)))
          (string (concat (sly-net-encode-length (length payload))
                          payload)))
     (sly-log-event sexp proc)
@@ -1669,10 +1673,6 @@ EVAL'd by Lisp."
   (string-to-number (buffer-substring (point) (+ (point) 6))
                     16))
 
-(defsubst sly-net-decode-length ()
-  (string-to-number (buffer-substring (point) (+ (point) 6))
-                    16))
-
 (defun sly-net-have-input-p ()
   "Return true if a complete message is available."
   (goto-char (point-min))
@@ -1719,15 +1719,6 @@ EVAL'd by Lisp."
 
 (defun sly-net-encode-length (n)
   (format "%06x" n))
-
-(defun sly-prin1-to-string (sexp)
-  "Like `prin1-to-string' but don't octal-escape non-ascii characters.
-This is more compatible with the CL reader."
-  (let (print-escape-nonascii
-        print-escape-newlines
-        print-length
-        print-level)
-    (prin1-to-string sexp)))
 
 
 ;;;; Connections
